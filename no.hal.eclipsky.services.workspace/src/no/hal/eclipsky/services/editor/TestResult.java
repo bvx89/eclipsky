@@ -21,27 +21,26 @@ public class TestResult extends RunResult {
 		super.setConsoleOutput(consoleOutput);
 		
 		String[] lines = consoleOutput.split("\n");
-		allTests = new ArrayList<Test>();
-		
-		Test t;
-		String testName = null, exception = "";
-		char status = 'O';
+		allTests = new ArrayList<Test>();		
 		for (int i = 0; i < lines.length - 1; i++) {
-			String line = lines[i];
-			if (line.charAt(0) == '*') {
-				testName = lines[++i];
-				status = lines[++i].charAt(0);
-				
-				exception = lines[++i];
-				while(i+1 < lines.length && !lines[i+1].isEmpty() && lines[i+1].charAt(0) != '*') {
-					exception += "\n" + lines[++i];
-				}
+			String line = lines[i].trim();
+			if (! line.startsWith("*")) {
+				continue;
 			}
-			
-			t = new Test(testName, status, exception);
-			
+			String testName = lines[++i], exception = "";
+			char status = lines[++i].charAt(0);
+			while (i+1 < lines.length && ! lines[i+1].startsWith("*")) {
+				if (exception.length() > 0) {
+					exception += "\n";
+				}
+				exception += lines[++i];
+			}
+			Test t = new Test(testName, status, exception);			
 			allTests.add(t);
-		}		
+		}
+		
+		// This will maintain the same order on the result for each test run
+		allTests.sort((t1, t2) -> t1.getTestName().compareTo(t2.getTestName()));
 	}
 
 	public List<Test> getAllTests() {
