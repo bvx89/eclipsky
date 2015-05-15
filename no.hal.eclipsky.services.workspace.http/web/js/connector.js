@@ -1,10 +1,12 @@
 var connector = (function() {
+	'use strict';
+
 	var webSocket = null,
-		connectionClosed = true;
-		
+		connectionClosed = true,
+	
 		// Set logging
-		logging = true,
-		c = (logging ? console : {log : function(){}});
+		logging = false,
+		c = (logging ? console : {log : function(){}}),
 		
 		// All subscribers need to implement a 'notify()'-function
 		subscribers = [], 
@@ -20,7 +22,7 @@ var connector = (function() {
 		for (var i = subscribers.length - 1; i >= 0; i--) {
 			subscribers[i].notify(data);
 		}
-	};
+	}
 	
 	// Add to the queue of requests to send
 	function push(data) {
@@ -31,7 +33,7 @@ var connector = (function() {
 			queue.push(data);
 		}
 		
-	};
+	}
 	
 	// Pop from the queue and perform a send request
 	function pop() {
@@ -48,7 +50,7 @@ var connector = (function() {
 		} else {
 			sendXHRdata(data);
 		}
-	};
+	}
 	
 	function sendWSdata(data) {
 		if (connectionClosed) {
@@ -57,7 +59,7 @@ var connector = (function() {
 		var wsData = data.op + ' ' + data.resourceRef +
 					(data.body !== undefined ? "\n" + data.body : '');
 		webSocket.send(wsData);
-	};
+	}
 	
 	// Private function for sending XHR requests
 	function sendXHRdata(data) {
@@ -65,12 +67,12 @@ var connector = (function() {
 			type: 'POST',
 			url: url + postfix,
 			data: data,
-			dataType: 'json',
+			dataType: 'json'
 		}).done(function(response) {
 			pop();
 			publish(response);
 		});		
-	};
+	}
 	
 	
 	function initializeWebsocket(url) {
@@ -99,8 +101,8 @@ var connector = (function() {
 			pop();
 			var data = JSON.parse(event.data);
 	    	publish(data);
-	    }
-	};
+	    };
+	}
 	
 	
 	return {
@@ -138,7 +140,7 @@ var connector = (function() {
 		},
 
 		usesWebSocket : function() {
-			return webSocket != null;
+			return webSocket !== null;
 		}
 	};
 	

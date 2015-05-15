@@ -201,11 +201,11 @@ summary.closed:before {
 }
 
 summary.error:before {
-	border-top-color: orange;
+	border-top-color: red;
 }
 
 summary.failed:before {
-	border-top-color: yellow;
+	border-top-color: orange;
 }
 
 summary.ok:before {

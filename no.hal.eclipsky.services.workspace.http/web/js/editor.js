@@ -1,7 +1,8 @@
 var connector = connector || {};
 
-var test;
 var editor = (function(ace, con, cookies) {
+	'use strict';
+
 	var _editor,
 		resources,
 		projectId,
@@ -17,7 +18,7 @@ var editor = (function(ace, con, cookies) {
 		saveTimer = null,
 		switchingResource = false,
 		
-		logging = true,
+		logging = false,
 		c = (logging ? console : {log : function(){}});
    
 	function initialize(editorId) {
@@ -29,14 +30,14 @@ var editor = (function(ace, con, cookies) {
 		// Enable auto completion
 		_editor.completers = [createCompleter()];
 		_editor.setOptions({
-		  enableBasicAutocompletion: true,
+		  enableBasicAutocompletion: true
 		});
 	   
 		// Add run command
 		_editor.commands.addCommand({
 			name: 'run',
 			readOnly: false,
-			bindKey: { win: 'Ctrl-'+RUN_KEY, mac: 'Command-'+RUN_KEY },
+			bindKey: { win: 'Ctrl-Alt-'+RUN_KEY, mac: 'Command-Alt-'+RUN_KEY },
 			exec: run
 		});
 	   
@@ -54,7 +55,7 @@ var editor = (function(ace, con, cookies) {
 		});
 		
 		return _editor;
-	};
+	}
        
 	/*
 	 * Sets a delay of 'saveDelay' after last typing
@@ -62,7 +63,7 @@ var editor = (function(ace, con, cookies) {
 	 */
 	function changed(event) {
 		if (event.delay) {
-			if (saveTimer != null) {
+			if (saveTimer !== null) {
 				clearTimeout(saveTimer);
 			}
 			event.delay = false;
@@ -73,21 +74,21 @@ var editor = (function(ace, con, cookies) {
 			sendAllContent();
 		}
 		
-	};
+	}
 
 	function sendAllContent(content) {
 		content = content || _editor.getSession().getValue();
 		con.send('update', resourceName, content);
-	};
+	}
    
    
 	function run(ev) {		
 		con.send('run', resourceName);
-	};
+	}
 
 	function test(ev) {		
 		con.send('test', resourceName);
-	};
+	}
    
    
 	/**
@@ -112,12 +113,13 @@ var editor = (function(ace, con, cookies) {
 				completionCallback = callback;
 			}
 		};
-	};
+	}
    
 	/**
 	*	Handling responses from requests to the server
 	*/
 	function handleResponse(data) {
+		var type;
 		if (data instanceof Array) {
 			if (data.length === 0) {
 				_editor.getSession().clearAnnotations();
@@ -126,27 +128,30 @@ var editor = (function(ace, con, cookies) {
 				}
 				return;
 			}
-			var type = data[0].type;
+			type = data[0].type;
 			switch(type) {
-				case 'problem':
-					updateMarkers(data);
-					if (_editor.getReadOnly()) {
-						con.send('completion', resourceName, offset);
-					}
-					break;
-				case 'completion':
-					completionCallback(null, data);
-					completionCallback = null;
-					_editor.setReadOnly(false);
-					break;
-				case 'test':
-					resources[currentId].testResults = {
-						stamp : new Date(), 
-						tests : data
-					};
+			case 'problem':
+				updateMarkers(data);
+				if (_editor.getReadOnly()) {
+					con.send('completion', resourceName, offset);
+				}
+				break;
+			case 'completion':
+				completionCallback(null, data);
+				completionCallback = null;
+				_editor.setReadOnly(false);
+				break;
+			case 'test':
+				resources[currentId].testResults = {
+					stamp : new Date(), 
+					tests : data
+				};
+				break;
+			default:
+				break;
 			}
 		} else {			
-			var type = data.type;
+			type = data.type;
 			switch(type) {
 			case 'refresh':
 				// Ignore other resources
@@ -179,9 +184,12 @@ var editor = (function(ace, con, cookies) {
 				if (_editor.getReadOnly()) {
 					_editor.setReadOnly(false);
 				}
+				break;
+			default:
+				break;
 			}
 		}
-	};
+	}
    
 	function calculateOffset(code, position){
 		var lines = code.split("\n");
@@ -191,7 +199,7 @@ var editor = (function(ace, con, cookies) {
 		}
 		offset += position.column;
 		return offset;
-	};
+	}
    
 	function updateMarkers(problems) {
 		if (typeof problems == "string") {
@@ -204,13 +212,13 @@ var editor = (function(ace, con, cookies) {
 								problem.lineNumber - 1);
 		});
 		_editor.getSession().setAnnotations(annotations);
-	};
+	}
 
 	function Annotation(type, message, lineNumber) {
 		this.type = type; // "error", "warning", "info"
 		this.text = message;
 		this.row = lineNumber;
-	};
+	}
 
 	function convertProblemSeverity(type) {
 		switch (type) {
@@ -218,11 +226,11 @@ var editor = (function(ace, con, cookies) {
 			case 'Info':    return 'info';
 			default:        return 'error';
 		}
-	};
+	}
    
 	function refreshResource() {
 		con.send('refresh', resourceName);
-	};
+	}
    
 	return {
 		init : function(el, baseUrl, id, editorArray) {

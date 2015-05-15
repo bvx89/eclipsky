@@ -3,12 +3,14 @@ var connector = connector || {},
 
 var test;
 var interfacer = (function(con) {
+	'use strict';
+
 	var ed,
 		isFetching = false,
 		isRunning = false,
 		startId = 0,
 
-		logging = true,
+		logging = false,
 		c = (logging ? console : {log : function(){}}),
 
 		startWidthPerc = 0.8,
@@ -31,19 +33,19 @@ var interfacer = (function(con) {
 		$tabs;
 
 	function initialize() {
-		$navbar = $('#tabs'),
-		$test = $('#tests'),
-		$editor = $('#main_editor'),
+		$navbar = $('#tabs');
+		$test = $('#tests');
+		$editor = $('#main_editor');
 		$editorWrapper = $('#editor_wrapper');
-		$console = $('#console').children()[0],
-		$dragbar = $('#dragbar'),
-		$btnRun = $('#btn_run'),
-		$btnTest = $('#btn_test'),
-		$test_list = $('#test_result'),
+		$console = $('#console').children()[0];
+		$dragbar = $('#dragbar');
+		$btnRun = $('#btn_run');
+		$btnTest = $('#btn_test');
+		$test_list = $('#test_result');
 		$test_tmpl = $('#test_tmpl');
 
 		// Adjust CSS in Firefox
-		if (navigator.userAgent.toLowerCase().indexOf('firefox') != -1) {
+		if (navigator.userAgent.toLowerCase().indexOf('firefox') !== -1) {
 			$dragbar.css('top', 0);
 			$test.css('top', 36);
 		}
@@ -51,8 +53,9 @@ var interfacer = (function(con) {
 		// Handle navbar
 		$tabs = $navbar.find('a');
 		$tabs.on('click', function(event) {
-			if (isFetching)
+			if (isFetching) {
 				event.preventDefault();
+			}
 		});
 
 		// Handle 'run'-button
@@ -85,7 +88,7 @@ var interfacer = (function(con) {
 					$editorWrapper.css('width',e.pageX+10);
 					$test.css('left',e.pageX+10);
 				}
-			})
+			});
 	    });
 
 		// Handling letting go of dragbar
@@ -93,7 +96,7 @@ var interfacer = (function(con) {
 	    	$(document).unbind('mousemove');
 
 	    	// Verify that it's not a default mousemove
-	    	if (startDragging == null) {
+	    	if (startDragging === null) {
 	    		return;
 	    	}
 
@@ -133,8 +136,9 @@ var interfacer = (function(con) {
 	}
 
 	function handleMessage(data) {
+		var type;
 		if (!(data instanceof Array)) {			
-			var type = data.type;
+			type = data.type;
 			switch(type) {
 			case 'run':
 				isRunning = false;
@@ -148,7 +152,6 @@ var interfacer = (function(con) {
 				break;
 			case 'refresh':
 				isFetching = false;
-				$editor.css('opacity', 1);
 				var prevResult = ed.getPreviousTests();
 				if (prevResult) {
 					c.log('prevResult', prevResult);
@@ -170,18 +173,23 @@ var interfacer = (function(con) {
 				window.location.hash = "#" + startId;
 				switchResource(startId, true);
 				break;
+			default:
+				break;
 			}
 		} else {
 			if (data.length == 0) {
 				isRunning = false;
 				return;
 			}
-			var type = data[0].type;
+
+			type = data[0].type;
 			switch(type) {
 			case 'test':
 				isRunning = false;
 				fillTests(data);
 				$test_list.show();
+				break;
+			default:
 				break;
 			}
 		}
@@ -291,12 +299,13 @@ var interfacer = (function(con) {
 
 	function getStatusClass(status) {
 		switch (status) {
-		case 'E':
-			return 'error';
 		case 'F':
 			return 'failed';
 		case 'O':
 			return 'ok';
+		case 'E':
+		default:
+			return 'error';
 		}
 	}
 
@@ -320,7 +329,7 @@ var interfacer = (function(con) {
 				}
 			}
 		} else {
-			correctedId = parseInt(id);
+			correctedId = parseInt(id, 10);
 			for (var i = $tabs.length - 1; i >= 0; i--) {
 				if (i != correctedId) {
 					$($tabs[i]).parent().removeClass('active');

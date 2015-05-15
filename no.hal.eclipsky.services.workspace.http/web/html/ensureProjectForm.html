@@ -17,15 +17,130 @@ src/objectstructures/
 package objectstructures;
 
 public class Card {
-    public static void main(String[] args) {
-        System.out.println("This is Card");
-    }
+	private char suit;
+	private int face = -1;
+
+	public final static String SUITS = "SHDC";
+	
+	public Card(char suit, int face) {
+	    /**
+	     * The constructor should pass a IllegalArgumentException if one of the
+	     * following conditions are broken:
+	     * 
+	     * - 'suit' must be one of the letters in SHDC
+	     * - 'face' must be between 1 and 13
+	     * 
+	     */
+		
+		this.suit = suit;
+		this.face = face;
+	}
+	
+	public String toString() {
+		return String.valueOf(suit) + face;
+	}
+
+	public char getSuit() {
+		return this.suit;
+	}
+	
+	public int getFace() {
+		return this.face;
+	}
+}
+--->8
+	CardDeck.java*
+8<---
+package objectstructures;
+
+import java.util.ArrayList;
+
+public class CardDeck {
+
+	// array to hold Card objects, filled in the constructor
+	private ArrayList<Card> cards;
+
+	public CardDeck(int suitSize) {
+		cards = new ArrayList<Card>();
+		for (int i = 0; i < Card.SUITS.length(); i++) {
+			for (int face = 1; face <= suitSize; face++) {
+				Card card = new Card(Card.SUITS.charAt(i), face);
+				cards.add(card);
+			}
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "[Deck " + cards.toString().substring(1);
+	}
+
+	public void deal(CardHand hand, int handSize) {
+		for (int i = 0 ; i < handSize ; i++) {
+			hand.addCard(cards.remove(cards.size() - 1));
+		}
+	}
+
+	public int getCardCount() {
+		return cards.size();
+	}
+	
+	public Card getCard(int i) {
+		if (i < 0 || i >= getCardCount()) {
+			throw new IllegalArgumentException(String.format("%s is an illegal card index, when the size of the deck is %s", i, getCardCount()));
+		}
+		return cards.get(i);
+	}
+	
+	public void shufflePerfectly() {
+		int halfSize = cards.size() / 2;
+		for (int i = 0; i < halfSize; i++) {
+			Card card = cards.remove(halfSize + i);
+			cards.add(i * 2 + 1, card);
+		}
+	}
+}
+--->8	
+	CardHand.java*
+8<---
+package objectstructures;
+
+import java.util.ArrayList;
+
+public class CardHand {
+	private ArrayList<Card> cards;
+
+	public CardHand() {
+		cards = new ArrayList<Card>();
+	}
+
+	@Override
+	public String toString() {
+		return "[Hand " + cards.toString().substring(1);
+	}
+
+    /**
+     * There might be something missing here...
+     */
+
+	public int getCardCount() {
+		return cards.size();
+	}
+	
+	public Card getCard(int i) {
+		if (i < 0 || i >= getCardCount()) {
+			throw new IllegalArgumentException(String.format("%s is an illegal card index, when the size of the hand is %s", i, getCardCount()));
+		}
+		return cards.get(i);
+	}
+	
+	public Card play(int i) {
+		return cards.remove(i);
+	}
 }
 
 --->8
-	CardDeck.java*;
-	CardHand.java*;
-;
+	;
 ;
 tests/objectstructures/
 	CardTest.java 		@ git@github.com:hallvard/jexercise/$testspath/CardTest.java;
