@@ -33,6 +33,8 @@ public class ResultPrinter implements TestListener {
     		getWriter().println(t.getStatus());
     		if (t.getException() != null) {
     			getWriter().println(t.getException());
+    		} else {
+    			getWriter().println("No exception message");
     		}
     	}
     	getWriter().println('*');
@@ -62,7 +64,7 @@ public class ResultPrinter implements TestListener {
      */
     public void addError(Test test, Throwable e) {
     	currentTest.setStatus('E');
-    	String exception = e.getLocalizedMessage();
+    	String exception = e.toString();
     	currentTest.setException(exception);
     }
 
@@ -70,7 +72,7 @@ public class ResultPrinter implements TestListener {
      * @see junit.framework.TestListener#addFailure(Test, AssertionFailedError)
      */
     public void addFailure(Test test, AssertionFailedError t) {
-    	currentTest.setStatus('E');
+    	currentTest.setStatus('F');
     	String exception = t.getLocalizedMessage();
     	currentTest.setException(exception);
     }
