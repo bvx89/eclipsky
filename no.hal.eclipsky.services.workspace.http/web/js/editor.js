@@ -25,7 +25,7 @@ var editor = (function(ace, con, cookies) {
 		// Configure the basics
 		ace.require("ace/ext/language_tools"); // Required for auto completion
 		_editor = ace.edit(editorId);
-		_editor.setTheme("ace/theme/monokai");
+		_editor.setTheme("ace/theme/idle_fingers");
 	   
 		// Enable auto completion
 		_editor.completers = [createCompleter()];
