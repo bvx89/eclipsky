@@ -69,8 +69,8 @@ public class AceEditorHelper {
                 </div>
                  */
                 writer.println("\t\t<div id=\"tests\">\n"
-                                + "\t\t\t<h1>Tests</h1>\n"
-                                + "\t\t\t<div><ul id=\"test_result\"></ul></div>\n"
+                                + "\t\t\t<div id=\"tests_headline\"><h1>Tests</h1><span id=\"refresh_status\">Refreshed</span></div>\n"
+                                + "\t\t\t<div id=\"tests_div\"><ul id=\"test_result\"></ul></div>\n"
                                 + "\t\t\t<button name=\"test\" id=\"btn_test\">Test</button>\n"
                                 + "\t\t</div>\n"
                                 + "\t</div>\n");

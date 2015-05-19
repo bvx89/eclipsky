@@ -30,7 +30,8 @@ var interfacer = (function(con) {
 		$test,
 		$test_list,
 		$test_tmpl,
-		$tabs;
+		$tabs,
+		$refreshStatus;
 
 	function initialize() {
 		$navbar = $('#tabs');
@@ -43,6 +44,7 @@ var interfacer = (function(con) {
 		$btnTest = $('#btn_test');
 		$test_list = $('#test_result');
 		$test_tmpl = $('#test_tmpl');
+		$refreshStatus = $('#refresh_status');
 
 		// Adjust CSS in Firefox
 		if (navigator.userAgent.toLowerCase().indexOf('firefox') !== -1) {
@@ -188,11 +190,19 @@ var interfacer = (function(con) {
 				isRunning = false;
 				fillTests(data);
 				$test_list.show();
+				notifyTestRefreshed();
 				break;
 			default:
 				break;
 			}
 		}
+	}
+
+	function notifyTestRefreshed() {
+		test = $refreshStatus;
+		$refreshStatus.fadeIn('fast', function () {
+		    $(this).delay(800).fadeOut('fast');
+		});
 	}
 
 	function fillTests(testResults) {
@@ -213,7 +223,7 @@ var interfacer = (function(con) {
 			var t = testResults[i];
 			$listEl = children[i];
 
-			$summary = $($listEl).find('summary');
+			var $summary = $($listEl).find('summary');
 			$summary.text(t.name);
 			$summary.removeClass();
 			$summary.addClass(getStatusClass(t.status));
